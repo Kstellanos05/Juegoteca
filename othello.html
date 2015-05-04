@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8">
+		<title>Juegoteca Online</title>
+		<link rel="stylesheet" href="css/estilos.css">
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/animaciones.js"></script>
+	</head>
+	<body>
+		<div id="contenido">
+			<header>
+				<form id="formulario" class="icon-triangle-left">
+					<input type="search" value="Búsqueda..." id="txtBuscar">
+					<button type="submit" class="icon-search"></button>
+				</form>
+				<figure>
+					<img src="img/logo.png" alt="logotipo">
+				</figure>
+				<h1>Juegoteca Online</h1>
+			</header>
+
+			<nav>
+				<ul>
+					<li><a href="index.html">Home</a></li>
+					<li><a href="">Ahorcado</a></li>
+					<li><a href="">Cuatro en linea</a></li>
+					<li><a href="">Memoria</a></li>
+					<li><a href="othello.html">Othello</a></li>
+					<li><a href="">Puzzle</a></li>
+					<li id="login"><a href="" class="icon-user"></a></li>
+				</ul>
+				<p class="icon-triangle-down">Iniciar Sesión</p>
+			</nav>
+
+			<section>
+				<div id="contenedorcanvas">
+					<canvas height="500" width="700" id="lienzo">
+						Tu navegador no soporta HTML5.
+					</canvas>
+					<div class="instrucciones">
+						<div id="contieneinstrucciones">
+							<h3>Othello</h3>
+							<p>
+								El reversi, Othello o Yang es un juego entre dos personas, que comparten 64 fichas iguales, de caras distintas, que se van colocando por turnos en un tablero dividido en 64 escaques. Las caras de las fichas se distinguen por su color y cada jugador tiene asignado uno de esos colores, ganando quien tenga más fichas sobre el tablero al finalizar la partida. Se clasifica como juego de tablero, abstracto y territorial.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<footer>
+				<p>Copyright &copy; 2015 Kstellanos@outlook.com</p>
+			</footer>
+		</div>
+
+		<script type="text/javascript" src="js/othello.js"></script>
+	</body>
+</html>
