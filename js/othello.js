@@ -22,6 +22,12 @@ function drawCircle(ctx, centrox, centroy, radio, color){
 	ctx.fill();
 }
 
+function drawText(ctx, text, x, y, color){
+	ctx.font = "italic bold 20px Arial";
+	ctx.fillStyle = color;
+	ctx.fillText(text, x, y);
+}
+
 function Cell(cx, cy, calto, cancho, contenido){
 	this.cx = cx;
 	this.cy = cy;
@@ -37,6 +43,8 @@ function Table(){
 	this.ancho = 320;
 	this.ctx = getCanvas();
 	this.cells = new Array();
+	this.puntos1 = 2;
+	this.puntos2 = 2;
 	this.drawTable = function(){
 		drawRectangle(this.ctx, this.posx, this.posy, this.alto, this.ancho);
 	}
@@ -87,12 +95,26 @@ function Table(){
 			for(var j=0; j<this.cells[i].length; j++){
 				var cell = this.cells[i][j];
 				if(cell.contenido == 1){
-					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, "#000");
-				}else if(cell.contenido == 2){
 					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, "#fff");
+				}else if(cell.contenido == 2){
+					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, "#000");
 				}
 			}
 		}
+	}
+	this.drawPoints = function(){
+		drawFillRectangle(this.ctx, 450, 50, 200, 200, "hsl(120, 100%, 40%)");
+		drawText(this.ctx, "Player 1", 465, 80, "#fff");
+		drawCircle(this.ctx, 490, 110, 15, "#fff");
+		drawText(this.ctx, "x" , 515, 117, "#fff");
+		drawText(this.ctx, String(this.puntos1), 535, 119, "#fff");
+		drawText(this.ctx, "Player 2", 465, 170, "#000");
+		drawCircle(this.ctx, 490, 200, 15, "#000");
+		drawText(this.ctx, "x" , 515, 207, "#000");
+		drawText(this.ctx, String(this.puntos2), 535, 209, "#000");
+	}
+	this.drawTurn = function(){
+
 	}
 }
 
@@ -102,4 +124,5 @@ $(document).ready(function(){
 	table.positionCells();
 	table.drawCells();
 	table.drawPieces();
+	table.drawPoints();
 });
