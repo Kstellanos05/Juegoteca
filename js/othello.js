@@ -45,6 +45,7 @@ function Table(){
 	this.cells = new Array();
 	this.puntos1 = 2;
 	this.puntos2 = 2;
+	this.turn = 1;
 	this.drawTable = function(){
 		drawRectangle(this.ctx, this.posx, this.posy, this.alto, this.ancho);
 	}
@@ -114,7 +115,14 @@ function Table(){
 		drawText(this.ctx, String(this.puntos2), 535, 209, "#000");
 	}
 	this.drawTurn = function(){
-
+		drawFillRectangle(this.ctx, 450, 260, 100, 200, "hsl(120, 100%, 30%)");
+		if(this.turn == 1){
+			drawText(this.ctx, "Turn:", 465, 290, "#fff");
+			drawText(this.ctx, "Player 1", 490, 320, "#fff");
+		}else if(this.turn == 2){
+			drawText(this.ctx, "Turn:", 465, 290, "#000");
+			drawText(this.ctx, "Player 2", 490, 320, "#fff");
+		}
 	}
 }
 
@@ -125,4 +133,5 @@ $(document).ready(function(){
 	table.drawCells();
 	table.drawPieces();
 	table.drawPoints();
+	table.drawTurn();
 });
