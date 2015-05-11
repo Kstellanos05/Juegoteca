@@ -99,6 +99,12 @@ function Table(){
 					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, "#fff");
 				}else if(cell.contenido == 2){
 					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, "#000");
+				}else if(cell.contenido == 3){
+					if(this.turn == 1)
+						var color = "#fff";
+					else
+						var color = "#000";
+					drawCircle(this.ctx, cell.cx+20, cell.cy+20, 18, color);
 				}
 			}
 		}
@@ -121,7 +127,125 @@ function Table(){
 			drawText(this.ctx, "Player 1", 490, 320, "#fff");
 		}else if(this.turn == 2){
 			drawText(this.ctx, "Turn:", 465, 290, "#000");
-			drawText(this.ctx, "Player 2", 490, 320, "#fff");
+			drawText(this.ctx, "Player 2", 490, 320, "#000");
+		}
+	}
+	this.getPosition = function(cx, cy){
+		var px = 0;
+		var py = 0;
+		for(var i=0; i<this.cells.length; i++){
+			for(var j=0; j<this.cells[i].length; j++){
+				var cell = this.cells[i][j];
+				if(cell.cx == cx && cell.cy == cy){
+					px = i;
+					py = j;
+				}
+			}
+		}
+		return [px, py];
+	}
+	this.validatePosition = function(actualX, actualY, movX, movY){
+		if(this.cells[actualX][actualY].contenido == 0 || this.cells[actualX][actualY].contenido == 3){
+			actualX += movX;
+			actualY += movY;
+			var enter = false;
+			if(this.turn == 1)
+				var contrario = 2;
+			else
+				var contrario = 1;
+			while(actualX>=0 && actualX<=7 && actualY>=0 && actualY<=7 && this.cells[actualX][actualY].contenido == contrario){
+				actualX += movX;
+				actualY += movY;
+				enter = true;
+			}
+			if(actualX>=0 && actualX<=7 && actualY>=0 && actualY<=7 && this.cells[actualX][actualY].contenido == 0)
+				enter = false;
+			if(actualX<0 || actualX>7 || actualY<0 || actualY>7)
+				enter = false;
+			return [enter, actualX, actualY];
+		}else{
+			return [false, actualX, actualY];
+		}
+	}
+	this.validateMove = function(cx, cy){
+		var position = this.getPosition(cx, cy);
+		var up = this.validatePosition(position[0], position[1], -1, 0);		//Arriba.
+		var down = this.validatePosition(position[0], position[1], 1, 0);		//Abajo.
+		var left = this.validatePosition(position[0], position[1], 0, -1);		//Izq.
+		var right = this.validatePosition(position[0], position[1], 0, 1);		//Der.
+		var ne = this.validatePosition(position[0], position[1], -1, 1);		//NorthEast.
+		var nw = this.validatePosition(position[0], position[1], -1, -1);		//NorthWest.
+		var se = this.validatePosition(position[0], position[1], 1, 1);			//SouthEast.
+		var sw = this.validatePosition(position[0], position[1], 1, -1);		//SouthWest.
+		var addresses = [up, down, left, right, ne, nw, se, sw];
+		return addresses;
+	}
+	this.deleteOption = function(){
+		for(var i=0; i<this.cells.length; i++){
+			for(var j=0; j<this.cells[i].length; j++){
+				if(this.cells[i][j].contenido == 3)
+					this.cells[i][j].contenido = 0;
+			}
+		}
+		this.drawCells();
+		this.drawPieces();
+	}
+	this.validateOption = function(cx, cy, cell){
+		this.deleteOption();
+		var posibility = this.validateMove(cx, cy);
+		var can = false;
+		for(var i=0; i<posibility.length; i++){
+			if(posibility[i][0])
+				can = true;
+		}
+		if(can){
+			for(var i=0; i<this.cells.length; i++){
+				for(var j=0; j<this.cells[i].length; j++){
+					if(cell == this.cells[i][j]){
+						this.cells[i][j].contenido = 3;
+						this.drawPieces();
+					}
+				}
+			}
+		}
+	}
+	this.countPoints = function(){
+		this.puntos1 = 0;
+		this.puntos2 = 0;
+		for(var i=0; i<this.cells.length; i++){
+			for(var j=0; j<this.cells[i].length; j++){
+				if(this.cells[i][j].contenido == 1)
+					this.puntos1++;
+				else if(this.cells[i][j].contenido == 2)
+					this.puntos2++;
+			}
+		}
+	}
+	this.endMovement = function(){
+		var end = false;
+		for(var i=0; i<this.cells.length; i++){
+			for(var j=0; j<this.cells[i].length; j++){
+				var opciones = this.validateMove(this.cells[i][j].cx, this.cells[i][j].cy);
+				for(var k=0; k<opciones.length; k++){
+					if(opciones[k][0]){
+						end = true;
+						//console.log(opciones[k][1] + " " + opciones[k][2]);
+					}
+				}
+			}
+		}
+		console.log(end);
+		if(!end){
+			var resultado = "";
+			if(this.puntos1 > this.puntos2)
+				resultado = "Winner: Player 1";
+			else if(this.puntos1 < this.puntos2)
+				resultado ="Winner: Player 2";
+			else
+				resultado = "Equal";
+			alert("¡Fin del Juego!");
+			alert(resultado);
+			document.location.reload();
 		}
 	}
 }
@@ -134,4 +258,120 @@ $(document).ready(function(){
 	table.drawPieces();
 	table.drawPoints();
 	table.drawTurn();
+
+	$("#lienzo").bind("click mousemove", function(ev){
+		var pos = $(this).offset();
+		var mx = ev.pageX - pos.left;
+		var my = ev.pageY - pos.top;
+		var cell = null;
+		for(var i=0; i<table.cells.length; i++){
+			for(var j=0; j<table.cells[i].length; j++){
+				var aux = table.cells[i][j];
+				if(mx >= 50 && mx <= 370 && my >= 50 && my <= 370)
+					if(mx >= aux.cx && mx <= aux.cx+40 && my >= aux.cy && my <= aux.cy+40)
+						cell = aux;
+			}
+		}
+		if(cell != null){
+			if(ev.type == "mousemove"){
+				table.validateOption(cell.cx, cell.cy, cell);
+			}else if(ev.type == "click"){
+				var opciones = table.validateMove(cell.cx, cell.cy);
+				var position = table.getPosition(cell.cx, cell.cy);
+				var yesTurn = false;
+				for(var i=0; i<opciones.length; i++){
+					if(opciones[i][0]){//Arriba.
+						if(position[0] > opciones[i][1] && position[1] == opciones[i][2]){
+							var j = (position[0]-1);
+							while(j>opciones[i][1]){
+								table.cells[j][position[1]].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								j--;
+							}
+						}//abajo.
+						if(position[0] < opciones[i][1] && position[1] == opciones[i][2]){
+							var j = (position[0]+1);
+							while(j<opciones[i][1]){
+								table.cells[j][position[1]].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								j++;
+							}
+						}//izq.
+						if(position[1] > opciones[i][2] && position[0] == opciones[i][1]){
+							var j = (position[1]-1);
+							while(j>opciones[i][2]){
+								table.cells[position[0]][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								j--;
+							}
+						}//der
+						if(position[1] < opciones[i][2] && position[0] == opciones[i][1]){
+							var j = (position[1]+1);
+							while(j<opciones[i][2]){
+								table.cells[position[0]][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								console.log("der"+position[0]+" "+position[1]+" "+table.turn);
+								j++;
+							}
+						}//diag-der-arriba
+						if(position[1] < opciones[i][2] && position[0] > opciones[i][1]){
+							var k = (position[0]-1);
+							var j = (position[1]+1);
+							while(j<opciones[i][2] && k>opciones[i][1]){
+								table.cells[k][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								console.log("diag"+position[0]+" "+position[1]+" "+table.turn);
+								k--;
+								j++;
+							}
+						}//diag-izq-arriba
+						if(position[1] > opciones[i][2] && position[0] > opciones[i][1]){
+							var k = (position[0]-1);
+							var j = (position[1]-1);
+							while(j>opciones[i][2] && k>opciones[i][1]){
+								console.log(k +" "+j);
+								table.cells[k][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								k--;
+								j--;
+							}
+						}//diag-der-abajo
+						if(position[1] < opciones[i][2] && position[0] < opciones[i][1]){
+							var k = (position[0]+1);
+							var j = (position[1]+1);
+							while(j<opciones[i][2] && k<opciones[i][1]){
+								console.log(k +" "+j);
+								table.cells[k][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								k++;
+								j++;
+							}
+						}//diag-izq-abajo
+						if(position[1] > opciones[i][2] && position[0] < opciones[i][1]){
+							var k = (position[0]+1);
+							var j = (position[1]-1);
+							while(j>opciones[i][2] && k<opciones[i][1]){
+								console.log(k +" "+j);
+								table.cells[k][j].contenido = table.turn;
+								table.cells[position[0]][position[1]].contenido = table.turn;
+								k++;
+								j--;
+							}
+						}
+						yesTurn = true;
+					}
+				}
+				if(yesTurn){
+					if(table.turn == 1)
+						table.turn = 2;
+					else
+						table.turn = 1;
+					table.drawTurn();
+					table.countPoints();
+					table.drawPoints();
+					table.endMovement();
+				}
+			}
+		}
+	});
 });
