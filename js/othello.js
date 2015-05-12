@@ -229,23 +229,36 @@ function Table(){
 				for(var k=0; k<opciones.length; k++){
 					if(opciones[k][0]){
 						end = true;
-						//console.log(opciones[k][1] + " " + opciones[k][2]);
 					}
 				}
 			}
 		}
-		console.log(end);
+		return end;
+	}
+	this.endPlay = function(){
+		var end = this.endMovement();
 		if(!end){
-			var resultado = "";
-			if(this.puntos1 > this.puntos2)
-				resultado = "Winner: Player 1";
-			else if(this.puntos1 < this.puntos2)
-				resultado ="Winner: Player 2";
+			if(this.turn == 1)
+				this.turn = 2;
 			else
-				resultado = "Equal";
-			alert("¡Fin del Juego!");
-			alert(resultado);
-			document.location.reload();
+				this.turn = 1;
+			var endcompleted = this.endMovement();
+			if(!endcompleted){
+				document.getElementById("fin").play();
+				var resultado = "";
+				if(this.puntos1 > this.puntos2)
+					resultado = "Winner: Player 1";
+				else if(this.puntos1 < this.puntos2)
+					resultado ="Winner: Player 2";
+				else
+					resultado = "Equal";
+				alert("¡Fin del Juego!");
+				alert(resultado);
+				document.location.reload();
+			}else{
+				alert("No tienes opciones de juego, El turno es de Player " + this.turn);
+				this.drawTurn();
+			}
 		}
 	}
 }
@@ -362,6 +375,7 @@ $(document).ready(function(){
 					}
 				}
 				if(yesTurn){
+					document.getElementById("soltar").play();
 					if(table.turn == 1)
 						table.turn = 2;
 					else
@@ -369,7 +383,7 @@ $(document).ready(function(){
 					table.drawTurn();
 					table.countPoints();
 					table.drawPoints();
-					table.endMovement();
+					table.endPlay();
 				}
 			}
 		}
